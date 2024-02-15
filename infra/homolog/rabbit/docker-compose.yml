@@ -1,0 +1,19 @@
+services:
+  jfgr-ecommerce-rabbitmq:
+    restart: always
+    image: rabbitmq:3.7.8-management
+    ports:
+      - "${RABBIT_PORT}:5672"
+      - "15672:15672"
+    networks:
+      - jfgr-ecommerce
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBIT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBIT_PASSWORD}
+    volumes:
+      - jfgr-ecommerce-rabbitmq:/var/lib/rabbitmq
+networks:
+  jfgr-ecommerce:
+    external: true
+volumes:
+  jfgr-ecommerce-rabbitmq:

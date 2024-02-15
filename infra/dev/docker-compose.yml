@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  jfgr-ecommerce-postgresql:
+    restart: always
+    build:
+      context: .
+      dockerfile: postgresql.dockerfile
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=${AUTH_DB},${CARRINHO_DB},${PAGAMENTO_DB},${GESTAO_ITENS_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - jfgr-ecommerce-dev-pgdata:/var/lib/postgresql/data
+    networks:
+      - jfgr-ecommerce-dev
+  jfgr-ecommerce-rabbitmq:
+    restart: always
+    image: rabbitmq:3.7.8-management
+    ports:
+      - "${RABBIT_PORT}:5672"
+      - "15672:15672"
+    networks:
+      - jfgr-ecommerce-dev
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBIT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBIT_PASSWORD}
+    volumes:
+      - jfgr-ecommerce-dev-rabbitmq:/var/lib/rabbitmq
+networks:
+  jfgr-ecommerce-dev:
+    driver: bridge
+volumes: 
+  jfgr-ecommerce-dev-pgdata:
+  jfgr-ecommerce-dev-rabbitmq:

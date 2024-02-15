@@ -1,0 +1,48 @@
+version: "3.9"
+services:
+  jfgr-gestao-itens-ecommerce-api:
+    restart: always
+    build: 
+      context: ./../../../projects/gestao-itens
+      dockerfile: Dockerfile
+    ports:
+      - "${GESTAO_ITENS_API_PORT}:8080"
+    networks:
+      - jfgr-ecommerce
+    environment:
+      - AUTH_API_HOST=http://jfgr-authentication-ecommerce-api
+      - AUTH_API_PORT=8080
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - GESTAO_ITENS_DB=${GESTAO_ITENS_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - GESTAO_ITENS_API_PORT=8080
+      - RABBIT_HOST=${RABBIT_HOST}
+      - RABBIT_PASSWORD=${RABBIT_PASSWORD}
+      - RABBIT_PORT=5672
+      - RABBIT_USER=${RABBIT_USER}
+      - TZ=America/Sao_Paulo
+  jfgr-gestao-itens-ecommerce-postgresql:
+    restart: always
+    build:
+      context: .
+      dockerfile: postgresql.dockerfile
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DB=${GESTAO_ITENS_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - PGPORT=${POSTGRES_PORT}
+    volumes:
+      - jfgr-gestao-itens-ecommerce-pgdata:/var/lib/postgresql/data
+    networks:
+      - jfgr-ecommerce
+networks:
+  jfgr-ecommerce:
+    external: true
+volumes: 
+  jfgr-gestao-itens-ecommerce-pgdata:
