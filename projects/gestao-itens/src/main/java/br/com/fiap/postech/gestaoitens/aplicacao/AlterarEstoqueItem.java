@@ -10,6 +10,7 @@ import br.com.fiap.postech.gestaoitens.dominio.repositorio.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.*;
 
@@ -41,10 +42,11 @@ public class AlterarEstoqueItem {
             }
         }
 
-        if(!itensSemEstoque.isEmpty()) {
-            notificarErroPedidoGateway.executa(FalhaPedidoDto.estoque(pedido, itensSemEstoque));
-        }else {
+        if(itensSemEstoque.isEmpty()) {
             liberarPedidoParaPagamentoGateway.executa(pedido);
+        }else {
+            notificarErroPedidoGateway.executa(FalhaPedidoDto.estoque(pedido, itensSemEstoque));
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 }
